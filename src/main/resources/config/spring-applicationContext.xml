@@ -16,9 +16,12 @@
     <!-- 自动扫描该包，使SpringMVC认为包下用了@controller注解的类是控制器 -->
     <context:component-scan base-package="com.stacey.shop.controller" />
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
-          destroy-method="close" p:driverClassName="com.mysql.jdbc.Driver"
-          p:url="jdbc:mysql://127.0.0.1:3306/shop-stacey?characterEncoding=utf8"
-          p:username="root" p:password="123456" p:maxIdle="10">
+          destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="username" value="${jdbc.username}"/>
+       <!-- <property name="maxIdle" value="${maxIdle}"/>-->
     </bean>
 
     <bean id="transactionManager"
@@ -26,7 +29,7 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
         <!--dataSource属性指定要用到的连接池-->
         <property name="dataSource" ref="dataSource" />
         <!--configLocation属性指定mybatis的核心配置文件-->

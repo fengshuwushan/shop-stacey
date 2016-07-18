@@ -4,6 +4,8 @@ import com.stacey.shop.entity.User;
 import com.stacey.shop.entity.UserRole;
 import com.stacey.shop.inter.IUser;
 import com.stacey.shop.inter.IUserRole;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -24,6 +26,8 @@ public class UserController {
     @Autowired
     public IUser iUser;
 
+    private static Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @RequestMapping("/userList")
     public ModelAndView listAll(HttpServletRequest request, HttpServletResponse response)
     {
@@ -34,6 +38,7 @@ public class UserController {
         ModelAndView modelAndView = new ModelAndView("userList");
         modelAndView.addObject("userList", userList);
         //modelAndView.addObject("password", user.getPassword());
+        logger.info("list all information test");
         return modelAndView;
     }
 }
