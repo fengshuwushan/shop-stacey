@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mappers.Role-mapper">
+    <parameterMap id="parameterRoleMap" type="Role">
+        <parameter property="id"/>
+        <parameter property="roleName"/>
+        <parameter property="roleSign"/>
+        <parameter property="description"/>
+    </parameterMap>
+
+    <insert id="insertRole" parameterMap="parameterRoleMap">
+        INSERT INTO `role` (role_name, role_sign, description) VALUES (#{roleName}, #{roleSign}, #{description})
+    </insert>
+    
+    <resultMap id="resultRole" type="Role">
+        <result property="id" column="id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="roleSign" column="role_sign"/>
+        <result property="description" column="description"/>
+        <collection property="permissionList" column="id" select="mappers.Permission-Role-mapper.getPermissionsByRoleId"/>
+        <collection property="userList" column="id" select="mappers.User-Role-mapper.getUserByRoleId"/>
+    </resultMap>
+
+    <select id="getRoleById" resultMap="resultRole" parameterType="int">
+        SELECT * from `role` where id = #{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.Permission-Role-mapper">
+    <parameterMap id="parameterRolePermissionMap" type="RolePermission">
+        <parameter property="id"/>
+        <parameter property="permissionId"/>
+        <parameter property="roleId"/>
+    </parameterMap>
+    <insert id="insertRolePermission" parameterMap="parameterRolePermissionMap">
+        INSERT INTO role_permission(id, permission_id, role_id) values (#{id}, #{permissionId}, #{roleId})
+    </insert>
+    <resultMap id="resultPermissionMapByRoleInfo" type="Permission">
+        <result property="id" column="id"/>
+        <result property="permissionName" column="permission_name"/>
+        <result property="permissionSign" column="permission_sign"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
+    <select id="getPermissionsByRoleId" resultMap="resultPermissionMapByRoleInfo" parameterType="int">
+        select p.*, rp.id, rp.role_id from permission p, role_permission rp where p.id = rp.permission_id and rp.permission_id = #{permission_id}
+    </select>
+
+    <resultMap id="resultRoleMapByPermissionInfo" type="Role">
+        <result property="id" column="id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="roleSign" column="role_sign"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
+    <select id="getRolesByPermissionId" resultMap="resultRoleMapByPermissionInfo" parameterType="int">
+        select r.*, rp.permission_id, rp.id from role r, role_permission rp where r.id = rp.role_id and rp.role_id = #{role_id}
+    </select>
+
+</mapper>

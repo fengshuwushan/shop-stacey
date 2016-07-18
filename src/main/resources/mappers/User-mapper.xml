@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.User-mapper">
+    <parameterMap id="parameterUserMap" type="User">
+        <parameter property="id"/>
+        <parameter property="username"/>
+        <parameter property="password"/>
+        <parameter property="state"/>
+        <parameter property="createTime"/>
+    </parameterMap>
+    
+    <insert id="insertUser" parameterMap="parameterUserMap">
+        INSERT INTO `user`(id, username, password, state, create_time) VALUES (#{id}, #{username}, #{password}, #{state}, #{createTime})
+    </insert>
+    
+    <resultMap id="resultUserMap" type="User">
+        <result property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="state" column="state"/>
+        <result property="createTime" column="create_time"/>
+        <collection property="roleList" column="id" select="mappers.User-Role-mapper.getRoleByUserId"/>
+    </resultMap>
+
+    <select id="getUserById" resultMap="resultUserMap" parameterType="int">
+        select * FROM `user` where id = #{id}
+    </select>
+</mapper>        
