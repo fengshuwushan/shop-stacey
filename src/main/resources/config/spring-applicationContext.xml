@@ -11,10 +11,9 @@
             http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
             http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd"
        default-autowire="byName" default-lazy-init="false">
-    <mvc:annotation-driven/>
     <context:property-placeholder location="classpath:config/database.properties" />
     <!-- 自动扫描该包，使SpringMVC认为包下用了@controller注解的类是控制器 -->
-    <context:component-scan base-package="com.stacey.shop.controller" />
+    <context:component-scan base-package="com.stacey.shop" />
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
           destroy-method="close">
         <property name="driverClassName" value="${jdbc.driver}"/>
@@ -46,4 +45,64 @@
         <property name="prefix" value="/WEB-INF/vm/" />
         <property name="suffix" value=".jsp" />
     </bean>
+    <!--shiro的配置，关键两点，配置SecurityManager和依赖的RealM-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager" />
+
+        <property name="loginUrl" value="/login" />
+        <property name="successUrl" value="/home" />
+        <property name="unauthorizedUrl" value="/login" />
+        <property name="filters">
+            <map>
+                <entry key="anno" value-ref="anno"/>
+                <!--<entry key="authc" value-ref="authc"/>-->
+            </map>
+        </property>
+        <property name="filterChainDefinitionMap">
+            <map>
+                <entry key="anon" value="anon"/>
+                <entry key="authc" value="authc"/>
+            </map>
+        </property>
+        <property name="filterChainDefinitions">
+            <value>
+                /login=anon
+                /**=authc
+            </value>
+        </property>
+    </bean>
+    <!--<bean id="authc" class="com.util.filter.MyAccessFilter"/>-->
+    <bean id="anno" class="org.apache.shiro.web.filter.authc.AnonymousFilter"/>
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="myRealm"/>
+        <property name="cacheManager" ref="cacheManager" />
+    </bean>
+    <bean id="myRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
+        <property name="dataSource" ref="dataSource" />
+        <property name="authenticationQuery"
+                  value="select t.password from user t where t.username = ?" />
+        <property name="userRolesQuery"
+                  value="select a.role_name from user_role t left join role a on t.role_id = a.id where t.username = ? " />
+        <property name="permissionsQuery"
+                  value="SELECT B.PERMISSION FROM ROLE T LEFT JOIN ROLE_PERMISSION A ON T.ID = A.ROLE_ID LEFT JOIN PERMISSION B ON A.PERMISSION_ID = B.ID WHERE T.ROLE_NAME = ? " />
+        <property name="permissionsLookupEnabled" value="true" />
+        <property name="saltStyle" value="NO_SALT" />
+        <property name="credentialsMatcher" ref="hashedCredentialsMatcher" />
+    </bean>
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManager" ref="ehCacheManager"/>
+    </bean>
+    <bean id="ehCacheManager" class ="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath:config/ehcache-shiro.xml" />
+        <property name="shared" value="true"></property>
+    </bean>
+    <bean id="hashedCredentialsMatcher"
+          class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <property name="hashAlgorithmName" value="SHA-256"/>
+        <!--<property name="hashAlgorithmName" value="SHA256" />-->
+        <property name="storedCredentialsHexEncoded" value="true" />
+        <property name="hashIterations" value="1" />
+    </bean>
+
+
 </beans>
